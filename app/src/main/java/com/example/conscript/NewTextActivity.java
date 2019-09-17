@@ -169,8 +169,7 @@ public class NewTextActivity extends AppCompatActivity {
 
     private void checkPermissions() {
         // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Permission is not granted
@@ -190,7 +189,15 @@ public class NewTextActivity extends AppCompatActivity {
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
-        }  // Permission has already been granted
+        } else {
+            MediaStore.Images.Media.insertImage(getContentResolver(), mImage, mTitle, mDescription);
+
+            Toast toast = Toast.makeText(this, "Text saved to the gallery!", Toast.LENGTH_LONG);
+            toast.show();
+
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+        }
     }
 
     @Override
@@ -202,12 +209,13 @@ public class NewTextActivity extends AppCompatActivity {
 
                 Toast toast = Toast.makeText(this, "Text saved to the gallery!", Toast.LENGTH_LONG);
                 toast.show();
+                Intent i = new Intent(this, MainActivity.class);
+                startActivity(i);
             } else {
                 Toast toast = Toast.makeText(this, "Permission to storage denied. Try to enable permissions through Settings->Apps->Conscript->Permissions.", Toast.LENGTH_LONG);
                 toast.show();
             }
-            Intent i = new Intent(this, MainActivity.class);
-            startActivity(i);
+
         }
     }
 
