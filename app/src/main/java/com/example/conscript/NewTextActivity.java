@@ -1,10 +1,15 @@
 package com.example.conscript;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -29,15 +34,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class NewTextActivity extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_REQUEST_SAVE_STORAGE = 1;
     private Spinner alphabetSpinner;
     private EditText translationText;
     private TextView availableLetters;
@@ -46,6 +49,9 @@ public class NewTextActivity extends AppCompatActivity {
     private Map<Character, Bitmap> mDictionary = new HashMap<>();
     private String mScript = "";
 
+    private Bitmap mImage;
+    private String mTitle;
+    private String mDescription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,19 +167,59 @@ public class NewTextActivity extends AppCompatActivity {
         return dateFormat.format(date);
     }
 
+    private void checkPermissions() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_SAVE_STORAGE);
+
+                // MY_PERMISSIONS_REQUEST_SAVE_STORAGE is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }  // Permission has already been granted
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == MY_PERMISSIONS_REQUEST_SAVE_STORAGE) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                MediaStore.Images.Media.insertImage(getContentResolver(), mImage, mTitle, mDescription);
+
+                Toast toast = Toast.makeText(this, "Text saved to the gallery!", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(this, "Permission to storage denied. Try to enable permissions through Settings->Apps->Conscript->Permissions.", Toast.LENGTH_LONG);
+                toast.show();
+            }
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+        }
+    }
+
     public void createText(View view) {
 
         String text = translationText.getText().toString();
         String script = alphabetSpinner.getSelectedItem().toString();
 
 
-        Bitmap result = translate(text, mDictionary);
-        MediaStore.Images.Media.insertImage(getContentResolver(), result, script + getTimestamp(), text);
-
-        Toast toast = Toast.makeText(this, "Text saved to the gallery!", Toast.LENGTH_LONG);
-        toast.show();
-
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        this.mImage = translate(text, mDictionary);
+        this.mTitle = script + getTimestamp();
+        this.mDescription = text;
+        checkPermissions();
     }
 }
