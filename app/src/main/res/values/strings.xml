@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Conscript</string>
+    <string name="new_script">＋\n\nNew script</string>
+    <string name="how_to_use">how to use</string>
+    <string name="new_text">＋\n\nNew text</string>
+    <string name="credits">how to use</string>
+    <string name="draw">draw</string>
+    <string name="erase">erase</string>
+    <string name="done">done</string>
+    <string name="symbols">Symbols</string>
+    <string name="tap_to_write">tap to write</string>
+    <string name="alphabet_name">Alphabet name</string>
+    <string name="hint">Write all the letters that the alphabet will contain (ie. abcdefg). Case sensitive. You can use any non-whitespace characters.</string>
+    <string name="choose_alphabet">Choose alphabet</string>
+    <string name="hint_long">Write a text to transcribe. If a symbol does not have a match in transcription it will be ignored.</string>
+    <string name="text_to_generate">Text to generate</string>
+    <string name="clear">clear</string>
+    <string name="choose_alphabet_to_see">Choose alphabet to see</string>
+    <string name="available_letters">Available symbols</string>
+</resources>
